@@ -1,5 +1,16 @@
 # 物性実験家のための無料でできる第一原理計算入門
 
+## 目次
+
+ ```@contents
+    Pages = [
+          "chapter1/VirturlBox.md",
+          "chapter1/MateriApps.md",
+          "chapter1/ASE.md",
+    ]
+    Depth = 3
+```
+
 ## はじめに
 2020年3月28日現在、世界中で新型コロナウイルスが猛威を振るっています。
 これにより、大学や研究所が閉鎖されていることが多いと聞きます。
@@ -26,13 +37,3 @@ https://cmsi.github.io/MateriAppsLive/
 入れさえすれば環境に依らずに実行することができます。
 仮想マシンとしてはVirtual Boxを用います。このインストール方法についても書く予定です。
 
-## 目次
-
- ```@contents
-    Pages = [
-          "chapter1/VirturlBox.md",
-          "chapter1/MateriApps.md",
-          "chapter1/ASE.md",
-    ]
-    Depth = 3
-```
