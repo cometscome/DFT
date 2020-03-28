@@ -9,6 +9,7 @@
           "chapter1/ASE.md",
           "ASE/howtouse.md",
           "QM/QM0.md",
+          "Samples/samples.md"
     ]
     Depth = 3
 ```
