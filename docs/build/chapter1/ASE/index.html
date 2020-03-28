@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Atomic Simulation Environment (ASE) · 物性実験家のための無料でできる第一原理計算入門</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">物性実験家のための無料でできる第一原理計算入門</span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Atomic Simulation Environment (ASE)</a><ul class="internal"><li><a class="tocitem" href="#ASEとは？-1"><span>ASEとは？</span></a></li><li><a class="tocitem" href="#ASEのインストール-1"><span>ASEのインストール</span></a></li><li><a class="tocitem" href="#サンプルコードの実行-1"><span>サンプルコードの実行</span></a></li><li><a class="tocitem" href="#Julia言語での実装-1"><span>Julia言語での実装</span></a></li></ul></li><li><a class="tocitem" href="../MateriApps/">MateriApps LIVE!のインストール</a></li><li><a class="tocitem" href="../VirturlBox/">Virtual Boxのインストール</a></li><li><a class="tocitem" href="../../">物性実験家のための無料でできる第一原理計算入門</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Atomic Simulation Environment (ASE)</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Atomic Simulation Environment (ASE)</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/cometscome/DFT/blob/master/docs/src/chapter1/ASE.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Atomic-Simulation-Environment-(ASE)-1"><a class="docs-heading-anchor" href="#Atomic-Simulation-Environment-(ASE)-1">Atomic Simulation Environment (ASE)</a><a class="docs-heading-anchor-permalink" href="#Atomic-Simulation-Environment-(ASE)-1" title="Permalink"></a></h1><h2 id="ASEとは？-1"><a class="docs-heading-anchor" href="#ASEとは？-1">ASEとは？</a><a class="docs-heading-anchor-permalink" href="#ASEとは？-1" title="Permalink"></a></h2><p>Atomic Simulation Environment (ASE)というパッケージがあります。これは、第一原理計算や分子動力学法などの様々なパッケージをPythonによって統一的に操作できるフリーのソフトウエアです。</p><p>https://wiki.fysik.dtu.dk/ase/index.html</p><p>面白いのは、ある原子配置が与えられた時に、その時のエネルギーと原子間に働く力さえ返せる外部パッケージであれば、様々なものをPythonで扱うことができるようになります。有名どころでは、第一原理計算パッケージのVASPやQuantumEspressoなどがあります。</p><p>また、分子動力学法ではなく、普通の第一原理計算ももちろん可能です。 ここでは、MateriApps Live!上でASEをインストールする方法について述べます。</p><h2 id="ASEのインストール-1"><a class="docs-heading-anchor" href="#ASEのインストール-1">ASEのインストール</a><a class="docs-heading-anchor-permalink" href="#ASEのインストール-1" title="Permalink"></a></h2><p>MateriApps LIVE!にはPythonが入っていますので、</p><pre><code class="language-sh">pip install ase</code></pre><p>とすればASEを簡単に入れることができます。このPythonのバージョンは2.7です。 ここで注意ですが、以下のサンプルコードはPython3系では動きませんでした。Python2系では動きました。</p><p>Python3で動かすためには、site-package/are/espresso.pyの292行目のmapをlist()で囲めば良いようです。</p><h2 id="サンプルコードの実行-1"><a class="docs-heading-anchor" href="#サンプルコードの実行-1">サンプルコードの実行</a><a class="docs-heading-anchor-permalink" href="#サンプルコードの実行-1" title="Permalink"></a></h2><p>NaCl結晶の格子定数を求めてみましょう。 実験的な格子定数は http://crystalbase.co.jp/index/b/nacl.html で、関連する日本語論文は https://www.jstage.jst.go.jp/article/jsssj/28/3/28<em>3</em>144/_pdf にあります。</p><p>https://wiki.fysik.dtu.dk/ase/ase/calculators/espresso.html にあるサンプルコードはそのままでは動きません。 <code>rocksalt.set_calculator(calc)</code> が足りません。また、擬ポテンシャルをちゃんと持っているものを指定しなければなりません。 ですので、</p><pre><code class="language-python">from ase.build import bulk
+from ase.calculators.espresso import Espresso
+from ase.constraints import UnitCellFilter
+from ase.optimize import LBFGS
+
+
+pseudopotentials = {&#39;Na&#39;: &#39;Na.pbe-spn-kjpaw_psl.1.0.0.UPF&#39;,
+                    &#39;Cl&#39;: &#39;Cl.pbe-n-rrkjus_psl.1.0.0.UPF&#39;}
+
+rocksalt = bulk(&#39;NaCl&#39;, crystalstructure=&#39;rocksalt&#39;, a=6.0)
+calc = Espresso(pseudopotentials=pseudopotentials,
+                tstress=True, tprnfor=True, kpts=(3, 3, 3))
+
+rocksalt.set_calculator(calc)
+
+ucf = UnitCellFilter(rocksalt)
+opt = LBFGS(ucf)
+opt.run(fmax=0.005)
+
+# cubic lattic constant
+print((8*rocksalt.get_volume()/len(rocksalt))**(1.0/3.0))
+</code></pre><p>とします。</p><p>ここで、MateriApps LIVE!でのQuantum Espressoの擬ポテンシャルは <code>/usr/share/espresso/pseudo</code> にありますので、</p><pre><code class="language-bash">cd /usr/share/espresso/pseudo
+sudo wget https://www.quantum-espresso.org/upf_files/Na.pbe-spn-kjpaw_psl.1.0.0.UPF
+sudo wget https://www.quantum-espresso.org/upf_files/Cl.pbe-n-rrkjus_psl.1.0.0.UPF</code></pre><p>として、NaとClの擬ポテンシャルをダウンロードします。なお、他の擬ポテンシャルは https://www.quantum-espresso.org/pseudopotentials にあります。</p><p>コードでは、格子定数を最初は6として、設定したあと、構造最適化をしています。最後に、構造最適化して出てきた格子定数をプリントしています。 サンプルコードをファイルに保存して、実行すると、</p><pre><code class="language-console">user@malive:~$ python test.py 
+       Step     Time          Energy         fmax
+LBFGS:    0 06:20:31    -1960.772207        0.5120
+LBFGS:    1 06:20:36    -1960.780670        0.4990
+LBFGS:    2 06:20:41    -1960.819410        0.3478
+LBFGS:    3 06:20:46    -1960.836529        0.1518
+LBFGS:    4 06:20:50    -1960.831494        0.0331
+LBFGS:    5 06:20:55    -1960.834038        0.0063
+LBFGS:    6 06:21:00    -1960.834046        0.0009
+5.659067832564933</code></pre><p>こんな感じで出力されて、第一原理計算を用いてNaClの結晶構造の最適化を行うことができました。</p><h2 id="Julia言語での実装-1"><a class="docs-heading-anchor" href="#Julia言語での実装-1">Julia言語での実装</a><a class="docs-heading-anchor-permalink" href="#Julia言語での実装-1" title="Permalink"></a></h2><p>PythonよりもJuliaが好きなので、Juliaでの実装についても述べておきます。</p><p>最後に、Julia言語での実装も書いておきます。 MateriApps LIVE!のディスクイメージへのインストールは、</p><pre><code class="language-sh">wget https://julialang-s3.julialang.org/bin/linux/x64/1.1/julia-1.1.0-linux-x86_64.tar.gz
+tar xzvf julia-1.1.0-linux-x86_64.tar.gz </code></pre><p>となります。ここではバージョンは1.1.0ですが、現在(2020年3月28日現在、1.4.0が出ていますので、そちらで構いません)</p><pre><code class="language-sh">~/julia-1.1.0/bin/julia</code></pre><p>で立ち上げて、さっきまで使っていたPythonを使うように</p><pre><code class="language-sh">ENV[&quot;PYTHON&quot;]=&quot;/usr/bin/python&quot;</code></pre><p>とし、 ]を押してパッケージモードにして、</p><pre><code class="language-none">add PyCall</code></pre><p>としてPyCallをインストールします。</p><p>そして、コードは、</p><pre><code class="language-julia">using PyCall
+const bulk = pyimport(&quot;ase.build&quot;).bulk
+const Espresso = pyimport(&quot;ase.calculators.espresso&quot;).Espresso
+const UnitCellFilter = pyimport(&quot;ase.constraints&quot;).UnitCellFilter
+const LBFGS = pyimport(&quot;ase.optimize&quot;).LBFGS
+
+
+pseudopotentials =Dict(&quot;Na&quot;=&gt; &quot;Na.pbe-spn-kjpaw_psl.1.0.0.UPF&quot;,&quot;Cl&quot; =&gt; &quot;Cl.pbe-n-rrkjus_psl.1.0.0.UPF&quot;)
+
+rocksalt = bulk(&quot;NaCl&quot;, crystalstructure=&quot;rocksalt&quot;, a=6.0)
+calc = Espresso(pseudopotentials=pseudopotentials,
+                tstress=true, tprnfor=true, kpts=(3, 3, 3))
+
+rocksalt.set_calculator(calc)
+
+
+ucf = UnitCellFilter(rocksalt)
+opt = LBFGS(ucf)
+opt.run(fmax=0.005)
+
+# cubic lattic constant
+println((8*rocksalt.get_volume()/length(rocksalt))^(1.0/3.0))</code></pre><p>となります。</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="../MateriApps/">MateriApps LIVE!のインストール »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 28 March 2020 20:40">Saturday 28 March 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
