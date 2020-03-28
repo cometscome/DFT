@@ -14,3 +14,12 @@
 サイトはこちらから。
 https://cometscome.github.io/DFT/build/
 
+## このサイトについて
+このサイトはGitHub上に作られており、追記したいあるいは改訂したい場合は通常のgitのように更新リクエストができます。
+また、原稿はJuliaのDocumenter.jlを使って作られています。
+https://juliadocs.github.io/Documenter.jl/stable/
+これを使うと、マークダウン形式で記事を書くことができます。
+適宜書いていくことになりますので、更新ペースがどうなるかはわかりません。
+
+
+
