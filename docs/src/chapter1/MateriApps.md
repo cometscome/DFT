@@ -21,6 +21,26 @@ VirtualBoxでは、Linuxが立ち上がります。
 https://github.com/cmsi/MateriAppsLive/wiki/GettingStarted
 こちらをみるとわかりやすいと思います。
 
+## MateriApps LIVE!のダウンロードとVirtual Boxへの導入。
+https://cmsi.github.io/MateriAppsLive/
+
+から最新版をダウンロードします。具体的には、「Download LIVE! image」をクリックし、「Download Latest version」をクリックしてダウンロードしてください。
+2.5GBくらいあります。
+
+ダウンロードできたら、Virtual Boxに導入します。
+Macの場合には、ダウンロードしたファイルをダブルクリックすれば導入できます。Windowsでも同様と思います。
+
+![fig1](../figs/MA01.png) 
+
+ここで、RAMというのがメモリです。コンピュータの中にコンピュータを作ることになるので、ここでのRAMは実際のメモリ以上にすることはできません。
+ここがなるべく多い方が快適です。4GBくらいあれば良いかと思います。
+また、CPU、というのは仮想マシンで使うCPUコアの数ですので、4コアあるようなマシンであれば2コアくらい割り当てておくと快適でしょう。
+これらはあとで変更することができます。
+
+あとはそのままで「インポート」を押します。
+これでVirtual Boxに導入されました
+
+
 
 
 ## 最初にすること
