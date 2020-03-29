@@ -10,6 +10,21 @@ https://wiki.fysik.dtu.dk/ase/index.html
 また、分子動力学法ではなく、普通の第一原理計算ももちろん可能です。
 ここでは、MateriApps Live!上でASEをインストールする方法について述べます。
 
+## いくつかのやり方
+ASEを使うにはいくつかのやり方があります。
+
+- 一つは、ターミナル（左下のツバメのボタンを押して「System Tools」から「LXTerminal」を選ぶ）から
+- Jupyter Notebookの使用（MatLabやMathematica的な操作感）
+- Virtual BoxにホストOSからSSH接続し、使う
+
+などがあります。Jupyter notebookが一番簡単かもしれないので、Jupyter notebookを使ってやってみましょう。
+
+["jupyter.md"]
+
+
+
+
+
 ##  ASEのインストール
 MateriApps LIVE!にはPythonが入っていますので、
 

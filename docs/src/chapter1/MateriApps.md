@@ -83,4 +83,10 @@ https://github.com/cmsi/MateriAppsLive/wiki/GettingStartedOVA
 これを簡単に調整するためには、メニューの「view」を選び、「Virtual Screen」を選んで、適当なものを選びます。
 最近のRetina DisplayのMacだと解像度が高すぎて字が見えない場合もあると思いますので、その場合は「Scale to 200%」などを選ぶとよいでしょう。
 
+## 便利なTips
+### 仮想PCの終了
+仮想PCを終了するためには、左下のツバメのようなものを押して、「log out」を選び、shut downをすればできます。
+
+### 仮想PCの開始
+Virtual Boxを立ち上げた状態で、MateriApps Live!を選び、「起動」を押します。
 
