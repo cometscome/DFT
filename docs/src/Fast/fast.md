@@ -165,7 +165,7 @@ input_data = {
 calc = Espresso(pseudopotentials=pseudopotentials,kpts=(4, 4, 4),input_data=input_data)
 atoms.set_calculator(calc)
 ```
-Quantum Espressoのパラメータをinput_dataで入れることができます。
+Quantum Espressoのパラメータを```input_data```で入れることができます。
 詳しくは
 http://www.stat.phys.titech.ac.jp/SATL_qe_tutorial/index.html
 が参考になると思います。
