@@ -19,10 +19,9 @@ ASEを使うにはいくつかのやり方があります。
 
 などがあります。Jupyter notebookが一番簡単かもしれないので、Jupyter notebookを使ってやってみましょう。
 
-["jupyter.md"]
+[Jupyter notebookの使用](@ref)
 
-
-
+以下はターミナルを用いたやり方です。あとでJupyter Notebookを使ったやり方に修正します。
 
 
 ##  ASEのインストール

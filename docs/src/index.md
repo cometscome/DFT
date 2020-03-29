@@ -8,8 +8,10 @@
           "chapter1/MateriApps.md",
           "chapter1/ASE.md",
           "ASE/howtouse.md",
+          "ASE/jupyter.md",
           "QM/QM0.md",
-          "Samples/samples.md"
+          "Samples/samples.md",
+          "Fast/fast.md"
     ]
     Depth = 3
 ```
