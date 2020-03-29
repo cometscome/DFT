@@ -28,12 +28,11 @@ ASEを使うにはいくつかのやり方があります。
 MateriApps LIVE!にはPythonが入っていますので、
 
 ```sh
-pip install ase
+sudo curl -kL https://bootstrap.pypa.io/get-pip.py | sudo python3
+sudo python3 -m pip install --upgrade --user ase
 ```
-とすればASEを簡単に入れることができます。このPythonのバージョンは2.7です。
-ここで注意ですが、以下のサンプルコードはPython3系では動きませんでした。Python2系では動きました。
+とすればASEを簡単に入れることができます。このPythonのバージョンは3.5です。
 
-Python3で動かすためには、site-package/are/espresso.pyの292行目のmapをlist()で囲めば良いようです。
 
 ## サンプルコードの実行
 
