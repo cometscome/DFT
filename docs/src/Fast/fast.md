@@ -142,3 +142,76 @@ LBFGS:    4 21:28:39    -1960.834037        0.0006
 ```
 と出ます。
 これで第一原理計算でNaClの構造最適化ができました。
+
+## 第一原理計算のテスト
+### Siのバンド構造
+Siのバンド計算をやってみましょう。
+まず、バルクのSiを用意し、計算としてQuantum Espressoを使うことにします。
+
+```python
+from ase.build import bulk
+from ase.calculators.espresso import Espresso
+atoms = bulk("Si") #バルクのSiの用意
+pseudopotentials = {'Si':'Si.pz-vbc.UPF'} #擬ポテンシャルの設定
+
+
+input_data = {
+    'system': {
+        'ecutwfc': 64,
+        'ecutrho': 576,
+        'nbnd' : 12 },
+    'disk_io': 'low'}  #Quantum Espressoのパラメータ
+
+calc = Espresso(pseudopotentials=pseudopotentials,kpts=(4, 4, 4),input_data=input_data)
+atoms.set_calculator(calc)
+```
+Quantum Espressoのパラメータをinput_dataで入れることができます。
+詳しくは
+http://www.stat.phys.titech.ac.jp/SATL_qe_tutorial/index.html
+が参考になると思います。
+
+ここのcalcを別のものにすると、別の第一原理計算ソフトを使うことができます。
+原子配置が与えられた時にエネルギーが返ってくればいいので、第一原理計算である必要もありません。
+詳しくは
+https://wiki.fysik.dtu.dk/ase/ase/calculators/calculators.html
+を見てみてください。
+
+次に、自己無撞着計算をして、電子密度を決定します。電子密度が決定されれば、各k点での計算をすることでバンド図を
+描くことができます。
+
+```python
+atoms.get_potential_energy()
+fermi_level = calc.get_fermi_level()
+print(fermi_level)
+```
+
+次に、バンド図用のバンド計算を行います。
+
+```python
+input_data.update({'calculation':'bands',
+                              'restart_mode':'restart',
+                               'verbosity':'high'})
+calc.set(kpts={'path':'LGXWG', 'npoints':100},
+          input_data=input_data)
+calc.calculate(atoms)
+```
+となります。ここで、kptsのpathに好きなブリルアンゾーンの点を入れることで、簡単にバンド図を描くことができるのがASEの面白い点です。
+L点、Gamma点、X点、W点、Gamma点の順番にバンドを描きます。
+
+計算が終わったら、図をプロットしましょう。
+
+```python
+import matplotlib.pyplot as plt
+
+bs = calc.band_structure()
+bs.reference = fermi_level
+
+bs.plot(emax=15, filename='Si.png')
+```
+でできます。
+
+得られた図は
+
+![fig2](./Si.png)
+
+となります。よくみるSiのバンド図になっていますね。
