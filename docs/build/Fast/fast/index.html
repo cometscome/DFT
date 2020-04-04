@@ -54,4 +54,59 @@ calc.calculate(atoms)</code></pre><p>となります。ここで、kptsのpath�
 bs = calc.band_structure()
 bs.reference = fermi_level
 
-bs.plot(emax=15, filename=&#39;Si.png&#39;)</code></pre><p>でできます。</p><p>得られた図は</p><p><img src="../Si.png" alt="fig2"/></p><p>となります。よくみるSiのバンド図になっていますね。</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../ASE/jupyter/">« Jupyter notebookの使用</a><a class="docs-footer-nextpage" href="../../QM/QM0/">Quantum Espresso »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 29 March 2020 19:46">Sunday 29 March 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+bs.plot(emax=15, filename=&#39;Si.png&#39;)</code></pre><p>でできます。</p><p>得られた図は</p><p><img src="../Si.png" alt="fig2"/></p><p>となります。よくみるSiのバンド図になっていますね。</p><h3 id="金属の計算：Cuのバンド図-1"><a class="docs-heading-anchor" href="#金属の計算：Cuのバンド図-1">金属の計算：Cuのバンド図</a><a class="docs-heading-anchor-permalink" href="#金属の計算：Cuのバンド図-1" title="Permalink"></a></h3><p>Cuのバンド計算をやってみましょう。 まず、最初のSCF計算は</p><pre><code class="language-python">from ase import Atoms
+from ase.build import bulk
+from ase.calculators.espresso import Espresso
+atoms = bulk(&quot;Cu&quot;)
+pseudopotentials = {&#39;Cu&#39;:&#39;Cu.pz-d-rrkjus.UPF&#39;}
+
+input_data = {
+    &#39;system&#39;: {
+        &#39;ecutwfc&#39;: 30,
+        &#39;ecutrho&#39;: 240,
+        &#39;nbnd&#39; : 35,
+    &#39;occupations&#39; : &#39;smearing&#39;,
+        &#39;smearing&#39;:&#39;gauss&#39;,
+        &#39;degauss&#39; : 0.01},
+    &#39;disk_io&#39;: &#39;low&#39;}  # automatically put into &#39;control&#39;
+
+calc = Espresso(pseudopotentials=pseudopotentials,kpts=(4, 4, 4),input_data=input_data)
+atoms.set_calculator(calc)
+
+atoms.get_potential_energy()
+fermi_level = calc.get_fermi_level()
+print(fermi_level)</code></pre><p>となります。Siの時との違いはoccupationsがsmearingになっているなどですね。どうやら金属ではこの設定が重要だそうです。 <code>input_data</code>にはQuantum Espressoのパラメータが入りますが、ここは経験的なものが必要かもしれません。 とりあえず様々なチュートリアルをみると良いと思います。 例えば、 <a href="http://www.cmpt.phys.tohoku.ac.jp/~koretsune/SATL_qe_tutorial/index.html">quantum ESPRESSO tutorial</a> はとても良い資料だと思います。</p><p>次に、バンド計算は</p><pre><code class="language-python">input_data.update({&#39;calculation&#39;:&#39;bands&#39;,
+                              &#39;restart_mode&#39;:&#39;restart&#39;,
+                               &#39;verbosity&#39;:&#39;high&#39;})
+calc.set(kpts={&#39;path&#39;:&#39;GXWLGK&#39;, &#39;npoints&#39;:100},
+          input_data=input_data)
+calc.calculate(atoms)</code></pre><p>でできます。Siの時と同じですね。</p><p>そして、バンド図は</p><pre><code class="language-python">import matplotlib.pyplot as plt
+
+bs = calc.band_structure()
+bs.reference = fermi_level
+bs.plot(emax=40,emin=5,filename=&#39;Cu.png&#39;)</code></pre><p>となります。 バンド図は</p><p><img src="../Cu.png" alt="fig3"/></p><p>となります。</p><h3 id="金属の計算：Cuのフェルミ面-1"><a class="docs-heading-anchor" href="#金属の計算：Cuのフェルミ面-1">金属の計算：Cuのフェルミ面</a><a class="docs-heading-anchor-permalink" href="#金属の計算：Cuのフェルミ面-1" title="Permalink"></a></h3><p>次にCuのフェルミ面を出してみましょう。<a href="http://fermisurfer.osdn.jp/en/_build/html/qe.html">Fermisurfer</a>を使います。 まず、フェルミ面を書くための計算をします。</p><pre><code class="language-python">from ase import Atoms
+from ase.build import bulk
+from ase.calculators.espresso import Espresso
+atoms = bulk(&quot;Cu&quot;)
+pseudopotentials = {&#39;Cu&#39;:&#39;Cu.pz-d-rrkjus.UPF&#39;}
+
+input_data = {
+    &#39;system&#39;: {
+        &#39;ecutwfc&#39;: 30,
+        &#39;ecutrho&#39;: 240,
+        &#39;nbnd&#39; : 35,
+    &#39;occupations&#39; : &#39;smearing&#39;,
+        &#39;smearing&#39;:&#39;gauss&#39;,
+        &#39;degauss&#39; : 0.01},
+    &#39;CONTROL&#39;:{
+ &#39;calculation&#39;:&#39;scf&#39;,
+      &#39;prefix&#39;:&#39;Cu&#39; ,
+      &#39;outdir&#39;:&#39;./&#39;},
+    &#39;disk_io&#39;: &#39;low&#39;}  # automatically put into &#39;control&#39;
+
+calc = Espresso(pseudopotentials=pseudopotentials,kpts=(8, 8, 8),input_data=input_data)
+atoms.set_calculator(calc)
+
+atoms.get_potential_energy()
+fermi_level = calc.get_fermi_level()
+print(fermi_level)</code></pre><p>先ほどとほとんど同じです。ここで、<code>kpts=(8, 8, 8)</code>となっていますが、これがk点の数で、これが大きいほどフェルミ面が詳細に描けます。 ただし、計算は重くなっていきます。</p><p>これを実行したあと、フェルミ速度などを計算するコードを実行します。</p><pre><code class="language-none">!fermi_velocity.x  -in espresso.pwi</code></pre><p>ここで、<code>!</code>マークはPythonではなく通常の実行をする意味です。ですので。普通のターミナルからも実行できます。 なお、ASEではespressoのインプットファイルは自動的に作成され、名前は<code>espresso.pwi</code>です。</p><p>そして、</p><pre><code class="language-none">!fermisurfer vfermi.frmsf</code></pre><p>とすると、fermisurferが立ち上がります。</p><p><img src="../FermiCu.png" alt="fig4"/> 銅のよくあるフェルミ面が出てきましたでしょうか？</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../ASE/jupyter/">« Jupyter notebookの使用</a><a class="docs-footer-nextpage" href="../../QM/QM0/">Quantum Espresso »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 4 April 2020 20:51">Saturday 4 April 2020</span>. Using Julia version 1.4.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

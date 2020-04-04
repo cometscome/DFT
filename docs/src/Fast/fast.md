@@ -215,3 +215,119 @@ bs.plot(emax=15, filename='Si.png')
 ![fig2](./Si.png)
 
 となります。よくみるSiのバンド図になっていますね。
+
+### 金属の計算：Cuのバンド図
+Cuのバンド計算をやってみましょう。
+まず、最初のSCF計算は
+
+```python
+from ase import Atoms
+from ase.build import bulk
+from ase.calculators.espresso import Espresso
+atoms = bulk("Cu")
+pseudopotentials = {'Cu':'Cu.pz-d-rrkjus.UPF'}
+
+input_data = {
+    'system': {
+        'ecutwfc': 30,
+        'ecutrho': 240,
+        'nbnd' : 35,
+    'occupations' : 'smearing',
+        'smearing':'gauss',
+        'degauss' : 0.01},
+    'disk_io': 'low'}  # automatically put into 'control'
+
+calc = Espresso(pseudopotentials=pseudopotentials,kpts=(4, 4, 4),input_data=input_data)
+atoms.set_calculator(calc)
+
+atoms.get_potential_energy()
+fermi_level = calc.get_fermi_level()
+print(fermi_level)
+```
+となります。Siの時との違いはoccupationsがsmearingになっているなどですね。どうやら金属ではこの設定が重要だそうです。
+```input_data```にはQuantum Espressoのパラメータが入りますが、ここは経験的なものが必要かもしれません。
+とりあえず様々なチュートリアルをみると良いと思います。
+例えば、
+[quantum ESPRESSO tutorial](http://www.cmpt.phys.tohoku.ac.jp/~koretsune/SATL_qe_tutorial/index.html)
+はとても良い資料だと思います。
+
+次に、バンド計算は
+
+```python
+input_data.update({'calculation':'bands',
+                              'restart_mode':'restart',
+                               'verbosity':'high'})
+calc.set(kpts={'path':'GXWLGK', 'npoints':100},
+          input_data=input_data)
+calc.calculate(atoms)
+```
+でできます。Siの時と同じですね。
+
+そして、バンド図は
+
+```python
+import matplotlib.pyplot as plt
+
+bs = calc.band_structure()
+bs.reference = fermi_level
+bs.plot(emax=40,emin=5,filename='Cu.png')
+```
+となります。
+バンド図は
+
+![fig3](./Cu.png)
+
+となります。
+
+### 金属の計算：Cuのフェルミ面
+次にCuのフェルミ面を出してみましょう。[Fermisurfer](http://fermisurfer.osdn.jp/en/_build/html/qe.html)を使います。
+まず、フェルミ面を書くための計算をします。
+
+```python
+from ase import Atoms
+from ase.build import bulk
+from ase.calculators.espresso import Espresso
+atoms = bulk("Cu")
+pseudopotentials = {'Cu':'Cu.pz-d-rrkjus.UPF'}
+
+input_data = {
+    'system': {
+        'ecutwfc': 30,
+        'ecutrho': 240,
+        'nbnd' : 35,
+    'occupations' : 'smearing',
+        'smearing':'gauss',
+        'degauss' : 0.01},
+    'CONTROL':{
+ 'calculation':'scf',
+      'prefix':'Cu' ,
+      'outdir':'./'},
+    'disk_io': 'low'}  # automatically put into 'control'
+
+calc = Espresso(pseudopotentials=pseudopotentials,kpts=(8, 8, 8),input_data=input_data)
+atoms.set_calculator(calc)
+
+atoms.get_potential_energy()
+fermi_level = calc.get_fermi_level()
+print(fermi_level)
+```
+先ほどとほとんど同じです。ここで、```kpts=(8, 8, 8)```となっていますが、これがk点の数で、これが大きいほどフェルミ面が詳細に描けます。
+ただし、計算は重くなっていきます。
+
+これを実行したあと、フェルミ速度などを計算するコードを実行します。
+
+```
+!fermi_velocity.x  -in espresso.pwi
+```
+ここで、```!```マークはPythonではなく通常の実行をする意味です。ですので。普通のターミナルからも実行できます。
+なお、ASEではespressoのインプットファイルは自動的に作成され、名前は```espresso.pwi```です。
+
+そして、
+
+```
+!fermisurfer vfermi.frmsf
+```
+とすると、fermisurferが立ち上がります。
+
+![fig4](./FermiCu.png)
+銅のよくあるフェルミ面が出てきましたでしょうか？
