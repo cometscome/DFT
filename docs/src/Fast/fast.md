@@ -503,7 +503,7 @@ bs = calc.band_structure()
 bs.reference = fermi_level
 bs.plot(emax=40,emin=5)
 ```
-これで、ブラウザだけで
+これで、ブラウザだけで第一原理計算を実行できるようになりました。
 
 
 
