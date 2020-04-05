@@ -93,8 +93,8 @@ rocksalt =ase.io.read("NaCl_mp-22862_computed.cif")
 
 ```bash
 cd /usr/share/espresso/pseudo
-sudo wget https://www.quantum-espresso.org/upf_files/Na.pbe-spn-kjpaw_psl.1.0.0.UPF
-sudo wget https://www.quantum-espresso.org/upf_files/Cl.pbe-n-rrkjus_psl.1.0.0.UPF
+sudo wget https://www.quantum-espresso.org/upf_files/Na.pbesol-spn-kjpaw_psl.1.0.0.UPF
+sudo wget https://www.quantum-espresso.org/upf_files/Cl.pbesol-n-kjpaw_psl.1.0.0.UPF
 ```
 NaとClの擬ポテンシャルをダウンロードします。なお、他の擬ポテンシャルは
 https://www.quantum-espresso.org/pseudopotentials
@@ -111,8 +111,10 @@ from ase.constraints import UnitCellFilter
 from ase.optimize import LBFGS
 import ase.io 
 
-pseudopotentials = {'Na': 'Na.pbe-spn-kjpaw_psl.1.0.0.UPF',
-                    'Cl': 'Cl.pbe-n-rrkjus_psl.1.0.0.UPF'}
+#pseudopotentials = {'Na': 'Na.pbe-spn-kjpaw_psl.1.0.0.UPF',
+#                    'Cl': 'Cl.pbe-n-rrkjus_psl.1.0.0.UPF'} #擬ポテンシャルの種類が違うの修正
+pseudopotentials = {'Na': 'Na.pbesol-spn-kjpaw_psl.1.0.0.UPF',
+                    'Cl': 'Cl.pbesol-n-kjpaw_psl.1.0.0.UPF'}
 #rocksalt = bulk('NaCl', crystalstructure='rocksalt', a=6.0)
 rocksalt =ase.io.read("NaCl_mp-22862_computed.cif") #Material Projectでダウンロードしたものを使う場合。
 calc = Espresso(pseudopotentials=pseudopotentials,
@@ -408,8 +410,8 @@ NaClのディレクトリを作成し、移動します。
 そして、擬ポテンシャルをダウンロードします。
 
 ```
-!wget https://www.quantum-espresso.org/upf_files/Na.pbe-spn-kjpaw_psl.1.0.0.UPF
-!wget https://www.quantum-espresso.org/upf_files/Cl.pbe-n-rrkjus_psl.1.0.0.UPF
+!wget https://www.quantum-espresso.org/upf_files/Na.pbesol-spn-kjpaw_psl.1.0.0.UPF
+!wget https://www.quantum-espresso.org/upf_files/Cl.pbesol-n-kjpaw_psl.1.0.0.UPF
 ```
 これはNaClディレクトリに入りました。
 
@@ -422,8 +424,10 @@ from ase.constraints import UnitCellFilter
 from ase.optimize import LBFGS
 import ase.io 
 
-pseudopotentials = {'Na': 'Na.pbe-spn-kjpaw_psl.1.0.0.UPF',
-                    'Cl': 'Cl.pbe-n-rrkjus_psl.1.0.0.UPF'}
+#pseudopotentials = {'Na': 'Na.pbe-spn-kjpaw_psl.1.0.0.UPF',
+#                    'Cl': 'Cl.pbe-n-rrkjus_psl.1.0.0.UPF'} #擬ポテンシャルの種類が違うの修正
+pseudopotentials = {'Na': 'Na.pbesol-spn-kjpaw_psl.1.0.0.UPF',
+                    'Cl': 'Cl.pbesol-n-kjpaw_psl.1.0.0.UPF'}                    
 rocksalt = bulk('NaCl', crystalstructure='rocksalt', a=6.0)
 calc = Espresso(pseudopotentials=pseudopotentials,pseudo_dir = './',
                 tstress=True, tprnfor=True, kpts=(3, 3, 3))
