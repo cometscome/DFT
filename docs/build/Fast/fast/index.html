@@ -111,7 +111,93 @@ atoms.set_calculator(calc)
 
 atoms.get_potential_energy()
 fermi_level = calc.get_fermi_level()
-print(fermi_level)</code></pre><p>先ほどとほとんど同じです。ここで、<code>kpts=(8, 8, 8)</code>となっていますが、これがk点の数で、これが大きいほどフェルミ面が詳細に描けます。 ただし、計算は重くなっていきます。</p><p>これを実行したあと、フェルミ速度などを計算するコードを実行します。</p><pre><code class="language-none">!fermi_velocity.x  -in espresso.pwi</code></pre><p>ここで、<code>!</code>マークはPythonではなく通常の実行をする意味です。ですので。普通のターミナルからも実行できます。 なお、ASEではespressoのインプットファイルは自動的に作成され、名前は<code>espresso.pwi</code>です。</p><p>そして、</p><pre><code class="language-none">!fermisurfer vfermi.frmsf</code></pre><p>とすると、fermisurferが立ち上がります。</p><p><img src="../FermiCu.png" alt="fig4"/> 銅のよくあるフェルミ面が出てきましたでしょうか？</p><h1 id="Google-Colaboratoryを使って第一原理計算-1"><a class="docs-heading-anchor" href="#Google-Colaboratoryを使って第一原理計算-1">Google Colaboratoryを使って第一原理計算</a><a class="docs-heading-anchor-permalink" href="#Google-Colaboratoryを使って第一原理計算-1" title="Permalink"></a></h1><p>これまではMateriapps live!を使って計算していましたが、Google Colaboratoryを使った方法がわかりましたので、そちらも記します。 Google Colaboratoryはブラウザ上でGoogleの計算機上で計算を実行することができます。 GoogleのアカウントがあればすぐにPythonの実行環境が手に入ります。機械学習で使うライブラリがデフォルトで入っていて、環境構築が不要で人気です。 このGoogle ColabにQunatum Espressoを入れて第一原理計算をしてみましょう。</p><h2 id="Quantum-Espressoのインストール-1"><a class="docs-heading-anchor" href="#Quantum-Espressoのインストール-1">Quantum Espressoのインストール</a><a class="docs-heading-anchor-permalink" href="#Quantum-Espressoのインストール-1" title="Permalink"></a></h2><p>そのためにはQunatum Espressoをソースからコンパイルする必要がありますが、以下のような方法で可能であることがわかりました。 ポイントは、FFTW3をインストールしておくことです。</p><pre><code class="language-none">!git clone https://github.com/QEF/q-e.git
+print(fermi_level)</code></pre><p>先ほどとほとんど同じです。ここで、<code>kpts=(8, 8, 8)</code>となっていますが、これがk点の数で、これが大きいほどフェルミ面が詳細に描けます。 ただし、計算は重くなっていきます。</p><p>これを実行したあと、フェルミ速度などを計算するコードを実行します。</p><pre><code class="language-none">!fermi_velocity.x  -in espresso.pwi</code></pre><p>ここで、<code>!</code>マークはPythonではなく通常の実行をする意味です。ですので。普通のターミナルからも実行できます。 なお、ASEではespressoのインプットファイルは自動的に作成され、名前は<code>espresso.pwi</code>です。</p><p>そして、</p><pre><code class="language-none">!fermisurfer vfermi.frmsf</code></pre><p>とすると、fermisurferが立ち上がります。</p><p><img src="../FermiCu.png" alt="fig4"/> 銅のよくあるフェルミ面が出てきましたでしょうか？</p><h3 id="スピン軌道相互作用の考慮：SnTeのバンド計算-1"><a class="docs-heading-anchor" href="#スピン軌道相互作用の考慮：SnTeのバンド計算-1">スピン軌道相互作用の考慮：SnTeのバンド計算</a><a class="docs-heading-anchor-permalink" href="#スピン軌道相互作用の考慮：SnTeのバンド計算-1" title="Permalink"></a></h3><p>次は、スピン軌道相互作用を入れてみましょう。 対象の物質としては、SnTeを考えます。この物質はSnをPbに少し置換すると、トポロジカル結晶絶縁体、というものになることが知られています。 <a href="https://www.nature.com/articles/ncomms1969">Topological crystalline insulators in the SnTe material class</a> トポロジカル物質は大抵の場合スピン軌道相互作用が非常に重要でして、スピン軌道相互作用を考慮する計算をやることにします。</p><p>まず、結晶のデータを<a href="https://materialsproject.org/materials/mp-1883/">Materials Project</a> から取ってくることにします。ここで、前と同じようにcifデータをダウンロードしてください。 このページにはスピン軌道相互作用のない場合のバンド図もありますので、まず、このバンド図と同じ図を出すことにします。</p><p>ということで、スピン軌道相互作用なしのバンド図を描いてみます。 擬ポテンシャルをダウンロードします。ここで、SnとTeで同じタイプのものを選んでください。 この辺りが参考になると思います（<a href="http://www.stat.phys.titech.ac.jp/SATL_qe_tutorial/new_material.html">物質のインプットファイルを新たに作成する</a>）。 具体的には、<code>Pseudopotential type: USPP</code>とします。これはウルトラソフト型です。とりあえずこれを選んでおけば大丈夫でしょう（多分。詳しい人むしろ教えてください）。 交換相関汎関数も揃えてください。 ここでは、SnとTeで</p><pre><code class="language-none">!wget https://www.quantum-espresso.org/upf_files/Sn.pbesol-dn-rrkjus_psl.0.2.UPF
+!wget https://www.quantum-espresso.org/upf_files/Te.pbesol-dn-rrkjus_psl.0.2.2.UPF</code></pre><p>の二つをダウンロードしました。これはJupyter notebookで実行しているため!がついています。 ここで、スピン軌道相互作用を考慮しないので、「Scalar relativistic」を用いています。</p><p>これをNaClの時のように計算します。つまり、自己無撞着に電子密度を決定します。</p><pre><code class="language-python">from ase.build import bulk
+from ase.calculators.espresso import Espresso
+from ase.constraints import UnitCellFilter
+import ase.io 
+
+pseudopotentials = {&#39;Sn&#39;: &#39;Sn.pbesol-dn-rrkjus_psl.0.2.UPF&#39;,
+                    &#39;Te&#39;: &#39;Te.pbesol-dn-rrkjus_psl.0.2.2.UPF&#39;}
+atoms =ase.io.read(&quot;SnTe_mp-1883_computed.cif&quot;)
+
+input_data = {
+    &#39;system&#39;: {
+        &#39;ecutwfc&#39;: 30,
+        &#39;ecutrho&#39;: 240,
+        &#39;nbnd&#39; : 35,
+    &#39;occupations&#39; : &#39;smearing&#39;,
+        &#39;smearing&#39;:&#39;gauss&#39;,
+        &#39;degauss&#39; : 0.01},
+    &#39;CONTROL&#39;:{
+ &#39;calculation&#39;:&#39;scf&#39;,
+      &#39;prefix&#39;:&#39;SnTe&#39; ,
+      &#39;outdir&#39;:&#39;./&#39;,
+    &#39;pseudo_dir&#39;:&#39;./&#39;},
+    &#39;disk_io&#39;: &#39;low&#39;} 
+
+calc = Espresso(pseudopotentials=pseudopotentials,kpts=(4, 4, 4),input_data=input_data)
+atoms.set_calculator(calc)
+
+
+atoms.get_potential_energy()
+fermi_level = calc.get_fermi_level()
+print(fermi_level)</code></pre><p>とします。ここで、<code>pseudo_dir</code>を設定していますが、これは、計算するディレクトリを指定しており、そこの擬ポテンシャルを使うためです。 計算を実行後、バンド図用の計算を行います。</p><pre><code class="language-python">input_data.update({&#39;calculation&#39;:&#39;bands&#39;,
+                              &#39;restart_mode&#39;:&#39;restart&#39;,
+                               &#39;verbosity&#39;:&#39;high&#39;})
+calc.set(kpts={&#39;path&#39;:&#39;GLUWLU&#39;, &#39;npoints&#39;:100},
+          input_data=input_data)
+calc.calculate(atoms)</code></pre><p>そして、図を</p><pre><code class="language-python">import matplotlib.pyplot as plt
+
+bs = calc.band_structure()
+bs.reference = fermi_level
+
+bs.plot(emax=13,emin=4,filename=&#39;SnTe.png&#39;)
+bs.plot(emax=fermi_level+2,emin=fermi_level-2,filename=&#39;SnTe_mag.png&#39;)</code></pre><p>とプロットします。ここでは二つプロットしました。</p><p>結果は、</p><p><img src="../SnTe.png" alt="figSnTe1"/> <img src="../SnTe_mag.png" alt="figSnTe2"/></p><p>となります。</p><p>次に、スピン軌道相互作用を入れてみましょう。 擬ポテンシャルをスピン軌道相互作用対応にしなければなりません。そこで、</p><pre><code class="language-none">!wget https://www.quantum-espresso.org/upf_files/Sn.rel-pbesol-dn-rrkjus_psl.0.2.UPF
+!wget https://www.quantum-espresso.org/upf_files/Te.rel-pbesol-dn-rrkjus_psl.0.2.2.UPF</code></pre><p>をダウンロードしてきます。これらは、<code>Full relativistic</code>と書いてあるものです。</p><p>そして、</p><pre><code class="language-python">from ase.build import bulk
+from ase.calculators.espresso import Espresso
+from ase.constraints import UnitCellFilter
+import ase.io 
+pseudopotentials = {&#39;Sn&#39;: &#39;Sn.rel-pbesol-dn-rrkjus_psl.0.2.UPF&#39;,
+                    &#39;Te&#39;: &#39;Te.rel-pbesol-dn-rrkjus_psl.0.2.2.UPF&#39;}
+
+atoms =ase.io.read(&quot;SnTe_mp-1883_computed.cif&quot;)
+
+input_data = {
+    &#39;system&#39;: {
+        &#39;ecutwfc&#39;: 30,
+        &#39;ecutrho&#39;: 240,
+        &#39;nbnd&#39; : 35,
+    &#39;occupations&#39; : &#39;smearing&#39;,
+        &#39;smearing&#39;:&#39;gauss&#39;,
+        &#39;degauss&#39; : 0.01,
+    &#39;noncolin&#39;: True,
+    &#39;lspinorb&#39;: True},
+    &#39;CONTROL&#39;:{
+ &#39;calculation&#39;:&#39;scf&#39;,
+      &#39;prefix&#39;:&#39;SnTe&#39; ,
+      &#39;outdir&#39;:&#39;./&#39;,
+    &#39;pseudo_dir&#39;:&#39;./&#39;},
+    &#39;disk_io&#39;: &#39;low&#39;} 
+
+calc = Espresso(pseudopotentials=pseudopotentials,kpts=(4, 4, 4),input_data=input_data)
+atoms.set_calculator(calc)
+
+
+atoms.get_potential_energy()
+fermi_level = calc.get_fermi_level()
+print(fermi_level)</code></pre><p>が自己無撞着計算のコードです。ここで、スピン軌道相互作用を計算する際には<code>noncolin</code>と<code>lspinorb</code>をTrueにする必要があります。 <a href="https://www.quantum-espresso.org/Doc/pw_user_guide/node10.html">Noncollinear magnetization, spin-orbit interactions</a></p><p>そして、バンド図は</p><pre><code class="language-python">input_data.update({&#39;calculation&#39;:&#39;bands&#39;,
+                              &#39;restart_mode&#39;:&#39;restart&#39;,
+                               &#39;verbosity&#39;:&#39;high&#39;})
+calc.set(kpts={&#39;path&#39;:&#39;GLUWLU&#39;, &#39;npoints&#39;:100},
+          input_data=input_data)
+calc.calculate(atoms)</code></pre><p>で計算でき、プロットは</p><pre><code class="language-python">import matplotlib.pyplot as plt
+
+bs = calc.band_structure()
+bs.reference = fermi_level
+
+bs.plot(emax=13,emin=4,filename=&#39;SnTe_SO.png&#39;)
+bs.plot(emax=fermi_level+2,emin=fermi_level-2,filename=&#39;SnTe_mag_SO.png&#39;)</code></pre><p>でできます。</p><p>得られた図は</p><p><img src="../SnTe_SO.png" alt="figSnTe1_SO"/> <img src="../SnTe_SO_mag.png" alt="figSnTe2_SO"/></p><p>となります。</p><h1 id="Google-Colaboratoryを使って第一原理計算-1"><a class="docs-heading-anchor" href="#Google-Colaboratoryを使って第一原理計算-1">Google Colaboratoryを使って第一原理計算</a><a class="docs-heading-anchor-permalink" href="#Google-Colaboratoryを使って第一原理計算-1" title="Permalink"></a></h1><p>これまではMateriapps live!を使って計算していましたが、Google Colaboratoryを使った方法がわかりましたので、そちらも記します。 Google Colaboratoryはブラウザ上でGoogleの計算機上で計算を実行することができます。 GoogleのアカウントがあればすぐにPythonの実行環境が手に入ります。機械学習で使うライブラリがデフォルトで入っていて、環境構築が不要で人気です。 このGoogle ColabにQunatum Espressoを入れて第一原理計算をしてみましょう。</p><h2 id="Quantum-Espressoのインストール-1"><a class="docs-heading-anchor" href="#Quantum-Espressoのインストール-1">Quantum Espressoのインストール</a><a class="docs-heading-anchor-permalink" href="#Quantum-Espressoのインストール-1" title="Permalink"></a></h2><p>そのためにはQunatum Espressoをソースからコンパイルする必要がありますが、以下のような方法で可能であることがわかりました。 ポイントは、FFTW3をインストールしておくことです。</p><pre><code class="language-none">!git clone https://github.com/QEF/q-e.git
 !apt-get install -y libfftw3-3 libfftw3-dev libfftw3-doc
 %cd q-e
 !DFLAGS=&#39;-D__OPENMP -D__FFTW3 -D__MPI -D__SCALAPACK&#39; FFT_LIBS=&#39;-lfftw3&#39;  ./configure --enable-openmp</code></pre><p>ソースをダウンロードし、FFTW3をインストール、そしてコンパイル準備をしています。 次に、</p><pre><code class="language-none">!make pw</code></pre><p>でQuantum Espressoのコアのコードであるpw.xを実行できます。 あとはポストプロセスツールである、pp:</p><pre><code class="language-none">make pp</code></pre><p>もインストールしておきましょう。</p><p>さて、<a href="https://qiita.com/kuronekodaisuki/items/d7910259120ef805f686">Google colaboratoryでOSSをビルドする</a> にありますように、ここでコンパイルしたバイナリは12時間後に消滅してしまいます。 ですので、</p><pre><code class="language-none">from google.colab import drive
@@ -173,4 +259,4 @@ calc.calculate(atoms)</code></pre><p>最後にバンド図を計算します。<
 
 bs = calc.band_structure()
 bs.reference = fermi_level
-bs.plot(emax=40,emin=5)</code></pre><p>これで、ブラウザだけで第一原理計算を実行できるようになりました。</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../ASE/jupyter/">« Jupyter notebookの使用</a><a class="docs-footer-nextpage" href="../../QM/QM0/">Quantum Espresso »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 5 April 2020 20:02">Sunday 5 April 2020</span>. Using Julia version 1.4.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+bs.plot(emax=40,emin=5)</code></pre><p>これで、ブラウザだけで第一原理計算を実行できるようになりました。</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../ASE/jupyter/">« Jupyter notebookの使用</a><a class="docs-footer-nextpage" href="../../QM/QM0/">Quantum Espresso »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 5 April 2020 21:13">Sunday 5 April 2020</span>. Using Julia version 1.4.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

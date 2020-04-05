@@ -334,6 +334,176 @@ print(fermi_level)
 ![fig4](./FermiCu.png)
 銅のよくあるフェルミ面が出てきましたでしょうか？
 
+### スピン軌道相互作用の考慮：SnTeのバンド計算
+次は、スピン軌道相互作用を入れてみましょう。
+対象の物質としては、SnTeを考えます。この物質はSnをPbに少し置換すると、トポロジカル結晶絶縁体、というものになることが知られています。
+[Topological crystalline insulators in the SnTe material class](https://www.nature.com/articles/ncomms1969)
+トポロジカル物質は大抵の場合スピン軌道相互作用が非常に重要でして、スピン軌道相互作用を考慮する計算をやることにします。
+
+まず、結晶のデータを[Materials Project](https://materialsproject.org/materials/mp-1883/)
+から取ってくることにします。ここで、前と同じようにcifデータをダウンロードしてください。
+このページにはスピン軌道相互作用のない場合のバンド図もありますので、まず、このバンド図と同じ図を出すことにします。
+
+ということで、スピン軌道相互作用なしのバンド図を描いてみます。
+擬ポテンシャルをダウンロードします。ここで、SnとTeで同じタイプのものを選んでください。
+この辺りが参考になると思います（[物質のインプットファイルを新たに作成する](http://www.stat.phys.titech.ac.jp/SATL_qe_tutorial/new_material.html)）。
+具体的には、```Pseudopotential type: USPP ```とします。これはウルトラソフト型です。とりあえずこれを選んでおけば大丈夫でしょう（多分。詳しい人むしろ教えてください）。
+交換相関汎関数も揃えてください。
+ここでは、SnとTeで
+
+```
+!wget https://www.quantum-espresso.org/upf_files/Sn.pbesol-dn-rrkjus_psl.0.2.UPF
+!wget https://www.quantum-espresso.org/upf_files/Te.pbesol-dn-rrkjus_psl.0.2.2.UPF
+```
+の二つをダウンロードしました。これはJupyter notebookで実行しているため!がついています。
+ここで、スピン軌道相互作用を考慮しないので、「Scalar relativistic」を用いています。
+
+これをNaClの時のように計算します。つまり、自己無撞着に電子密度を決定します。
+
+```python
+from ase.build import bulk
+from ase.calculators.espresso import Espresso
+from ase.constraints import UnitCellFilter
+import ase.io 
+
+pseudopotentials = {'Sn': 'Sn.pbesol-dn-rrkjus_psl.0.2.UPF',
+                    'Te': 'Te.pbesol-dn-rrkjus_psl.0.2.2.UPF'}
+atoms =ase.io.read("SnTe_mp-1883_computed.cif")
+
+input_data = {
+    'system': {
+        'ecutwfc': 30,
+        'ecutrho': 240,
+        'nbnd' : 35,
+    'occupations' : 'smearing',
+        'smearing':'gauss',
+        'degauss' : 0.01},
+    'CONTROL':{
+ 'calculation':'scf',
+      'prefix':'SnTe' ,
+      'outdir':'./',
+    'pseudo_dir':'./'},
+    'disk_io': 'low'} 
+
+calc = Espresso(pseudopotentials=pseudopotentials,kpts=(4, 4, 4),input_data=input_data)
+atoms.set_calculator(calc)
+
+
+atoms.get_potential_energy()
+fermi_level = calc.get_fermi_level()
+print(fermi_level)
+```
+とします。ここで、```pseudo_dir```を設定していますが、これは、計算するディレクトリを指定しており、そこの擬ポテンシャルを使うためです。
+計算を実行後、バンド図用の計算を行います。
+
+```python
+input_data.update({'calculation':'bands',
+                              'restart_mode':'restart',
+                               'verbosity':'high'})
+calc.set(kpts={'path':'GLUWLU', 'npoints':100},
+          input_data=input_data)
+calc.calculate(atoms)
+```
+そして、図を
+
+```python
+import matplotlib.pyplot as plt
+
+bs = calc.band_structure()
+bs.reference = fermi_level
+
+bs.plot(emax=13,emin=4,filename='SnTe.png')
+bs.plot(emax=fermi_level+2,emin=fermi_level-2,filename='SnTe_mag.png')
+```
+とプロットします。ここでは二つプロットしました。
+
+結果は、
+
+![figSnTe1](./SnTe.png)
+![figSnTe2](./SnTe_mag.png)
+
+となります。
+
+次に、スピン軌道相互作用を入れてみましょう。
+擬ポテンシャルをスピン軌道相互作用対応にしなければなりません。そこで、
+
+```
+!wget https://www.quantum-espresso.org/upf_files/Sn.rel-pbesol-dn-rrkjus_psl.0.2.UPF
+!wget https://www.quantum-espresso.org/upf_files/Te.rel-pbesol-dn-rrkjus_psl.0.2.2.UPF
+```
+をダウンロードしてきます。これらは、```Full relativistic```と書いてあるものです。
+
+そして、
+
+```python
+from ase.build import bulk
+from ase.calculators.espresso import Espresso
+from ase.constraints import UnitCellFilter
+import ase.io 
+pseudopotentials = {'Sn': 'Sn.rel-pbesol-dn-rrkjus_psl.0.2.UPF',
+                    'Te': 'Te.rel-pbesol-dn-rrkjus_psl.0.2.2.UPF'}
+
+atoms =ase.io.read("SnTe_mp-1883_computed.cif")
+
+input_data = {
+    'system': {
+        'ecutwfc': 30,
+        'ecutrho': 240,
+        'nbnd' : 35,
+    'occupations' : 'smearing',
+        'smearing':'gauss',
+        'degauss' : 0.01,
+    'noncolin': True,
+    'lspinorb': True},
+    'CONTROL':{
+ 'calculation':'scf',
+      'prefix':'SnTe' ,
+      'outdir':'./',
+    'pseudo_dir':'./'},
+    'disk_io': 'low'} 
+
+calc = Espresso(pseudopotentials=pseudopotentials,kpts=(4, 4, 4),input_data=input_data)
+atoms.set_calculator(calc)
+
+
+atoms.get_potential_energy()
+fermi_level = calc.get_fermi_level()
+print(fermi_level)
+```
+が自己無撞着計算のコードです。ここで、スピン軌道相互作用を計算する際には```noncolin```と```lspinorb```をTrueにする必要があります。
+[Noncollinear magnetization, spin-orbit interactions](https://www.quantum-espresso.org/Doc/pw_user_guide/node10.html)
+
+そして、バンド図は
+
+```python
+input_data.update({'calculation':'bands',
+                              'restart_mode':'restart',
+                               'verbosity':'high'})
+calc.set(kpts={'path':'GLUWLU', 'npoints':100},
+          input_data=input_data)
+calc.calculate(atoms)
+```
+で計算でき、プロットは
+
+```python
+import matplotlib.pyplot as plt
+
+bs = calc.band_structure()
+bs.reference = fermi_level
+
+bs.plot(emax=13,emin=4,filename='SnTe_SO.png')
+bs.plot(emax=fermi_level+2,emin=fermi_level-2,filename='SnTe_mag_SO.png')
+```
+でできます。
+
+得られた図は
+
+![figSnTe1_SO](./SnTe_SO.png)
+![figSnTe2_SO](./SnTe_SO_mag.png)
+
+となります。
+
+
 # Google Colaboratoryを使って第一原理計算
 これまではMateriapps live!を使って計算していましたが、Google Colaboratoryを使った方法がわかりましたので、そちらも記します。
 Google Colaboratoryはブラウザ上でGoogleの計算機上で計算を実行することができます。
