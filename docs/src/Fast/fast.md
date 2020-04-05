@@ -331,3 +331,179 @@ print(fermi_level)
 
 ![fig4](./FermiCu.png)
 銅のよくあるフェルミ面が出てきましたでしょうか？
+
+# Google Colaboratoryを使って第一原理計算
+これまではMateriapps live!を使って計算していましたが、Google Colaboratoryを使った方法がわかりましたので、そちらも記します。
+Google Colaboratoryはブラウザ上でGoogleの計算機上で計算を実行することができます。
+GoogleのアカウントがあればすぐにPythonの実行環境が手に入ります。機械学習で使うライブラリがデフォルトで入っていて、環境構築が不要で人気です。
+このGoogle ColabにQunatum Espressoを入れて第一原理計算をしてみましょう。
+
+## Quantum Espressoのインストール
+そのためにはQunatum Espressoをソースからコンパイルする必要がありますが、以下のような方法で可能であることがわかりました。
+ポイントは、FFTW3をインストールしておくことです。
+
+```
+!git clone https://github.com/QEF/q-e.git
+!apt-get install -y libfftw3-3 libfftw3-dev libfftw3-doc
+%cd q-e
+!DFLAGS='-D__OPENMP -D__FFTW3 -D__MPI -D__SCALAPACK' FFT_LIBS='-lfftw3'  ./configure --enable-openmp
+```
+ソースをダウンロードし、FFTW3をインストール、そしてコンパイル準備をしています。
+次に、
+
+```
+!make pw
+```
+でQuantum Espressoのコアのコードであるpw.xを実行できます。
+あとはポストプロセスツールである、pp:
+
+```
+make pp
+```
+もインストールしておきましょう。
+
+さて、[Google colaboratoryでOSSをビルドする](https://qiita.com/kuronekodaisuki/items/d7910259120ef805f686)
+にありますように、ここでコンパイルしたバイナリは12時間後に消滅してしまいます。
+ですので、
+
+```
+from google.colab import drive
+drive.mount('/content/drive')
+```
+を実行してご自分のGoogle Driveにバイナリを保存しておきましょう。次に使うときはこれを解凍して使います。
+
+```
+%cd /content/
+!zip -r /content/drive/'My Drive'/q-e.zip q-e 
+```
+としてq-e.zipを保存しておきます。
+
+Quantum Espressoを実行できるように、環境変数を設定します。つまり、
+
+```
+import os
+os.environ['PATH'] = "/content/q-e/bin:"+os.environ['PATH']
+```
+とします。
+
+## ASEのインストール
+ASEのインストールは簡単で、
+
+```
+!pip install ase
+```
+で入ります。
+
+## 第一原理計算のテスト
+上でやっていた第一原理計算をこちらでもやってみましょう。
+
+### NaClの構造最適化
+NaClのディレクトリを作成し、移動します。
+
+```
+%cd /content
+!mkdir NaCl
+%cd NaCl
+```
+そして、擬ポテンシャルをダウンロードします。
+
+```
+!wget https://www.quantum-espresso.org/upf_files/Na.pbe-spn-kjpaw_psl.1.0.0.UPF
+!wget https://www.quantum-espresso.org/upf_files/Cl.pbe-n-rrkjus_psl.1.0.0.UPF
+```
+これはNaClディレクトリに入りました。
+
+次に、
+
+```python
+from ase.build import bulk
+from ase.calculators.espresso import Espresso
+from ase.constraints import UnitCellFilter
+from ase.optimize import LBFGS
+import ase.io 
+
+pseudopotentials = {'Na': 'Na.pbe-spn-kjpaw_psl.1.0.0.UPF',
+                    'Cl': 'Cl.pbe-n-rrkjus_psl.1.0.0.UPF'}
+rocksalt = bulk('NaCl', crystalstructure='rocksalt', a=6.0)
+calc = Espresso(pseudopotentials=pseudopotentials,pseudo_dir = './',
+                tstress=True, tprnfor=True, kpts=(3, 3, 3))
+
+rocksalt.set_calculator(calc)
+
+ucf = UnitCellFilter(rocksalt)
+opt = LBFGS(ucf)
+opt.run(fmax=0.005)
+
+# cubic lattic constant
+print((8*rocksalt.get_volume()/len(rocksalt))**(1.0/3.0))
+```
+を実行すれば、NaClの構造最適化ができます。このコードでは擬ポテンシャルの場所を```pseudo_dir```で指定しています。今回は今いるディレクトリですね。
+
+### Cuのバンド図
+次に、Cuのバンド図を計算してみます。
+
+Cuのディレクトリを作成します。
+
+```
+%cd /content
+!mkdir Cu
+%cd Cu
+```
+
+擬ポテンシャルをダウンロードします。
+
+```
+!wget https://www.quantum-espresso.org/upf_files/Cu.pz-d-rrkjus.UPF
+```
+
+そして、まず自己無撞着計算をします。
+
+```python
+from ase import Atoms
+from ase.build import bulk
+from ase.calculators.espresso import Espresso
+atoms = bulk("Cu")
+pseudopotentials = {'Cu':'Cu.pz-d-rrkjus.UPF'}
+
+input_data = {
+    'system': {
+        'ecutwfc': 30,
+        'ecutrho': 240,
+        'nbnd' : 35,
+    'occupations' : 'smearing',
+        'smearing':'gauss',
+        'degauss' : 0.01},
+    'disk_io': 'low'}  # automatically put into 'control'
+
+calc = Espresso(pseudopotentials=pseudopotentials,kpts=(4, 4, 4),input_data=input_data,pseudo_dir = './')
+atoms.set_calculator(calc)
+
+atoms.get_potential_energy()
+fermi_level = calc.get_fermi_level()
+print(fermi_level)
+```
+
+そして、バンド図のための計算をします。
+
+```python
+input_data.update({'calculation':'bands',
+                              'restart_mode':'restart',
+                               'verbosity':'high'})
+calc.set(kpts={'path':'GXWLGK', 'npoints':100},
+          input_data=input_data)
+calc.calculate(atoms)
+```
+
+最後にバンド図を計算します。
+
+```python
+import matplotlib.pyplot as plt
+
+bs = calc.band_structure()
+bs.reference = fermi_level
+bs.plot(emax=40,emin=5)
+```
+これで、ブラウザだけで
+
+
+
