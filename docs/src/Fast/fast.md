@@ -501,7 +501,8 @@ bs.plot(emax=fermi_level+2,emin=fermi_level-2,filename='SnTe_mag_SO.png')
 ![figSnTe1_SO](./SnTe_SO.png)
 ![figSnTe2_SO](./SnTe_SO_mag.png)
 
-となります。
+となります。スピン軌道相互作用によってギャップが開いていることと、フェルミレベルから数えて２本目のバンドのスピン縮退が解けていることがわかります。
+他の文献を比べてみましょう。
 
 
 # Google Colaboratoryを使って第一原理計算
