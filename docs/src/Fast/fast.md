@@ -680,5 +680,27 @@ bs.plot(emax=40,emin=5)
 ```
 これで、ブラウザだけで第一原理計算を実行できるようになりました。
 
+## 計算の再開
+別に日に計算を再開したい場合は、以下のようにやるとできると思います。
+
+```python
+from google.colab import drive
+drive.mount('/content/drive')
+!cp /content/drive/'My Drive'/q-e.zip ./
+!unzip q-e.zip
+import os
+os.environ['PATH'] = "/content/q-e/bin:"+os.environ['PATH']
+!pip install ase
+```
+あとは、ディレクトリを作って、そこに擬ポテンシャルをダウンロードしたりすればよいでしょう。
+
+```python
+!mkdir NaCl
+%cd NaCl
+!wget https://www.quantum-espresso.org/upf_files/Na.pbe-spn-kjpaw_psl.1.0.0.UPF
+!wget https://www.quantum-espresso.org/upf_files/Cl.pbe-n-rrkjus_psl.1.0.0.UPF
+```
+
+
 
 
