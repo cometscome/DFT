@@ -701,6 +701,132 @@ os.environ['PATH'] = "/content/q-e/bin:"+os.environ['PATH']
 !wget https://www.quantum-espresso.org/upf_files/Cl.pbe-n-rrkjus_psl.1.0.0.UPF
 ```
 
+# DOSの計算
+状態密度の計算をしてみましょう。ここではColabを使います。
+
+まず擬ポテンシャルをダウンロードしておきます。
+
+```python
+!mkdir Si
+!cd Si
+!wget https://www.quantum-espresso.org/upf_files/Si.pz-vbc.UPF
+```
+
+次に、最初のSCF計算をします。
+
+```python
+from ase.build import bulk
+from ase.calculators.espresso import Espresso
+atoms = bulk("Si") #バルクのSiの用意
+pseudopotentials = {'Si':'Si.pz-vbc.UPF'} #擬ポテンシャルの設定
 
 
+input_data = {
+    'system': {
+        'ecutwfc': 64,
+        'ecutrho': 576,
+        'nbnd' : 12 },
+    'disk_io': 'low'}  #Quantum Espressoのパラメータ
 
+calc = Espresso(pseudopotentials=pseudopotentials,pseudo_dir = './',kpts=(4, 4, 4),input_data=input_data)
+atoms.set_calculator(calc)
+atoms.get_potential_energy()
+fermi_level = calc.get_fermi_level()
+print(fermi_level)
+```
+
+バンド図もついでに描いておきましょう。
+
+
+```python
+input_data.update({'calculation':'bands',
+                              'restart_mode':'restart',
+                               'verbosity':'high'})
+calc.set(kpts={'path':'LGXWG', 'npoints':100},
+          input_data=input_data)
+calc.calculate(atoms)
+```
+
+```python
+import matplotlib.pyplot as plt
+
+bs = calc.band_structure()
+bs.reference = fermi_level
+
+bs.plot(emax=15, filename='Si.png')
+```
+
+次に、DOS用の計算をします。これは、
+
+```python
+input_data.update({'calculation':'nscf',
+                              'restart_mode':'restart','smearing':'tetrahedra',
+                               'verbosity':'high'})
+calc.set(kpts=(16, 16, 16),
+          input_data=input_data)
+calc.calculate(atoms)
+```
+とします。ここで、nscfはSCF計算をやらない、という意味です。そして、smearingのtetrahedraはDOS計算でよく使うものです。
+kptsは運動量空間のk点の数で、これが多いほどDOSの精度が上がります。少なすぎるとピーキーな図になります。
+
+次に、DOSの計算を行います。Quantum EspressoではDOS用の計算のコードにdos.xがあります。
+ASEで対応していればいいのですが、今の所対応していないようなので、このdos.xを実行することにします。
+dos.x用のインプットファイルはColabでは
+
+```python
+%%bash
+cat <<EOF > espresso.dos.in
+&dos
+   outdir = './',
+   prefix='pwscf',
+   fildos='espresso.dos',
+   deltae =  0.1,
+/
+EOF
+```
+とすれば作成できます。espresso.dos.inというファイル名の中身を、EOFとEOFの間に記述しています。
+ここで、deltaeはDOSのスメアリングでこれを小さくすればするほどエネルギーの精度が上がりますが、
+その分k点を増やさないとピーキーになります。dos.x自体の計算はすぐ終わりますので、このdeltaeを色々変えて絵がどうなるかをみてみると良いと思います。
+
+これでファイルができました。
+
+
+```python
+!cat espresso.dos.in
+```
+で中身を確認できます。
+
+dos.xの実行は
+
+```python
+!dos.x < espresso.dos.in > espresso.dos.out
+```
+でできます。
+アウトプットはespresso.dos.outですので、中身の確認は
+
+```python
+!cat espresso.dos.out
+```
+でできます。あとはこれをプロットしてやるだけです。よくあるやり方でデータを読み込んでプロットしてみると、
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+%config InlineBackend.figure_format = 'retina'
+ene,dos,integrateddos = np.loadtxt("./espresso.dos",unpack=True)
+fig = plt.figure(figsize=(10, 6))
+ax = fig.add_subplot(111)
+ax.plot(ene, dos, color="k", label="DOS")
+#ax.set_xlim(-1,1 )
+ax.set_xlabel("E")
+ax.set_ylabel("")
+ax.legend(loc="upper left")
+plt.show()
+```
+
+得られたDOSは
+
+![figSiDOS](./SiDOS.png)
+
+となります。
