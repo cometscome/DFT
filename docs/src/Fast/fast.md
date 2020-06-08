@@ -830,3 +830,87 @@ plt.show()
 ![figSiDOS](./SiDOS.png)
 
 となります。
+
+DOSをもうすこし精度よく計算したい場合には、ブリルアンゾーン内の点の数を増やせばよいので、
+
+```python
+nput_data.update({'calculation':'nscf',
+                              'restart_mode':'restart','occupations':'tetrahedra',
+                               'verbosity':'low'})
+calc.set(kpts=(32, 32, 32),
+          input_data=input_data)
+calc.calculate(atoms)
+```
+とkptsを増やせばよいです。
+この時得られるDOSは
+
+得られたDOSは
+
+![figSiDOS_32](./SiDOS_32.png)
+
+となります。
+
+
+# 部分DOSの計算
+次に、軌道ごとのDOSを計算してみましょう。これも難しくありません。
+軌道ごとのDOSを計算するには、projwfc.xを使います。
+
+上ですでにDOSを計算していれば、projwfc.xのインプットファイルとして、
+
+```python
+%%bash
+cat <<EOF > espresso.projwfc.in
+&projwfc
+ prefix='pwscf'
+ outdir = './'
+ degauss = 0.01
+/
+EOF
+```
+を作り、
+
+```python
+!projwfc.x < espresso.projwfc.in > espresso.projwfc.out
+```
+を実行するだけです。
+
+Google Colabではなぜかファイル名のpwscf.pdos_atm#1(Si)_wfc#1(s)に'がついてしまっているので、
+
+```python
+!cat 'pwscf.pdos_atm#1(Si)_wfc#1(s)' > pwscf.pdos_atm1Si_wfc1s
+!cat 'pwscf.pdos_atm#1(Si)_wfc#2(p)' > pwscf.pdos_atm1Si_wfc2p
+!cat 'pwscf.pdos_atm#2(Si)_wfc#1(s)' > pwscf.pdos_atm2Si_wfc1s
+!cat 'pwscf.pdos_atm#2(Si)_wfc#2(p)' > pwscf.pdos_atm2Si_wfc2p
+```
+で抜いておきます。
+
+あとはプロットするだけです。
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+%config InlineBackend.figure_format = 'retina'
+ene,totpdos1Si1s,s1 = np.loadtxt("./pwscf.pdos_atm1Si_wfc1s",unpack=True)
+ene,totpdos1Si2p,px1,py1,pz1 = np.loadtxt("./pwscf.pdos_atm1Si_wfc2p",unpack=True)
+ene,totpdos2Si1s,s2 = np.loadtxt("./pwscf.pdos_atm2Si_wfc1s",unpack=True)
+ene,totpdos2Si2p,px2,py2,pz2 = np.loadtxt("./pwscf.pdos_atm2Si_wfc2p",unpack=True)
+fig = plt.figure(figsize=(10, 6))
+ax = fig.add_subplot(111)
+ax.plot(ene, totpdos1Si1s,label="1Si1s")
+ax.plot(ene, totpdos1Si2p,label="1Si2p")
+ax.plot(ene, totpdos2Si1s,label="2Si1s")
+ax.plot(ene, totpdos2Si2p,label="2Si2p")
+#ax.set_xlim(-1,1 )
+ax.set_xlabel("E")
+ax.set_ylabel("")
+ax.legend(loc="upper left")
+plt.show()
+```
+
+得られた部分DOSは
+
+![figSiPDOS](./SiPDOS.png)
+
+となります。
+
