@@ -19,9 +19,16 @@ sudo curl -kL https://bootstrap.pypa.io/get-pip.py | sudo python3
 次に、
 
 ```
-sudo python3 -m pip install --upgrade --user ase
+python3 -m pip install --upgrade --user ase
 ```
 と入れてください。
+
+
+MateriApps 3.0以降の場合には、上記の2行ではなく、
+```sh
+pip3 install --upgrade --user ase
+```
+でASEをインストールすることができます。
 
 次に
 [Jupyter Notebookの起動](@ref)

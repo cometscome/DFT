@@ -29,9 +29,18 @@ MateriApps LIVE!にはPythonが入っていますので、
 
 ```sh
 sudo curl -kL https://bootstrap.pypa.io/get-pip.py | sudo python3
-sudo python3 -m pip install --upgrade --user ase
+python3 -m pip install --upgrade --user ase
 ```
 とすればASEを簡単に入れることができます。このPythonのバージョンは3.5です。
+
+MateriApps 3.0以降の場合には、上記ではなく、
+
+```sh
+pip3 install --upgrade --user ase
+```
+でASEをインストールすることができます。
+
+
 
 
 ## サンプルコードの実行
