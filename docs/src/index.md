@@ -35,6 +35,11 @@ https://juliadocs.github.io/Documenter.jl/stable/
 これを使うと、マークダウン形式で記事を書くことができます。
 適宜書いていくことになりますので、更新ペースがどうなるかはわかりません。
 
+## 質問について
+こちらの記事に関する質問は
+https://github.com/cometscome/DFT/issues
+にしていただけるとスムーズに回答できると思います。
+
 ## 方針について
 基本的にMateriApps LIVE!を
 https://cmsi.github.io/MateriAppsLive/

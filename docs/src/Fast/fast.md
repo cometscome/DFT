@@ -3,6 +3,11 @@
 順番にやってみてください。固体の第一原理計算をQuantum Espressoで実行することを念頭においています。
 ここに書いたことはあとで項別にまとめる予定です。
 
+## 質問について
+こちらの記事に関する質問は
+https://github.com/cometscome/DFT/issues
+にしていただけるとスムーズに回答できると思います。
+
 ## 最初に行うこと
 [MateriApps LIVE!のインストール](@ref)
 をみて、MateriApps LIVE!のインストールを終わらせてください。
