@@ -184,7 +184,7 @@ atoms.set_calculator(calc)
 ```
 Quantum Espressoのパラメータを```input_data```で入れることができます。
 詳しくは
-http://www.stat.phys.titech.ac.jp/SATL_qe_tutorial/index.html
+[quantum ESPRESSO tutorial](http://www.stat.phys.titech.ac.jp/SATL_qe_tutorial/index.html)
 が参考になると思います。
 
 ここのcalcを別のものにすると、別の第一原理計算ソフトを使うことができます。
